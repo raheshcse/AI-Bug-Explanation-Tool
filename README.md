@@ -1,66 +1,75 @@
 # 🐞 AI Bug Explanation Tool
 
-An AI-powered full-stack debugging assistant that helps developers understand, investigate, and resolve software errors faster.
+An AI-powered debugging assistant that helps developers understand, troubleshoot, and resolve software errors faster using a locally hosted Large Language Model (LLM).
 
-Built with **React**, **ASP.NET Core Web API**, and modern software architecture principles, the application allows users to submit error messages, stack traces, and code snippets to receive intelligent bug analysis, root cause explanations, fix recommendations, and prevention guidance.
-
----
-
-## 🚀 Project Overview
-
-Debugging software issues can often be time-consuming, especially when dealing with unfamiliar error messages, large stack traces, or complex codebases.
-
-The AI Bug Explanation Tool aims to simplify the debugging process by transforming technical errors into clear, actionable insights that developers can understand and resolve quickly.
-
-The platform serves as an intelligent debugging companion that explains:
-
-* What the error means
-* Why it occurred
-* Possible root causes
-* Recommended fixes
-* Corrected code examples
-* Prevention strategies
+Built with **React**, **ASP.NET Core Web API**, and **Ollama**, the platform analyzes error messages, stack traces, and code snippets to provide intelligent bug explanations, root cause analysis, suggested fixes, corrected code, and prevention recommendations.
 
 ---
 
-## ✨ Current Features
+## 🚀 Overview
 
-### Bug Analysis Form
+Debugging software issues can be one of the most time-consuming parts of software development.
 
-Submit:
+The AI Bug Explanation Tool simplifies this process by allowing developers to submit:
 
-* Programming Language
-* Framework / Technology
-* Error Message
-* Stack Trace
-* Code Snippet
+* Error Messages
+* Stack Traces
+* Code Snippets
+* Programming Language Information
+* Framework Details
 
-### Intelligent Analysis Engine
+The AI engine then analyzes the issue and returns structured troubleshooting guidance.
 
-Generate:
+---
 
-* Bug Summary
+## ✨ Features
+
+### Intelligent Bug Analysis
+
+Analyze:
+
+* Runtime Exceptions
+* Null Reference Errors
+* API Failures
+* SQL Errors
+* Frontend Errors
+* Backend Exceptions
+* Validation Issues
+* Configuration Problems
+
+### AI-Generated Insights
+
+Receive:
+
+* Severity Assessment
+* Summary
 * Root Cause Analysis
 * Suggested Fixes
-* Corrected Code Recommendations
+* Corrected Code Examples
 * Prevention Tips
-* Severity Classification
 
-### Full-Stack Architecture
+### Multi-Language Support
 
-* React Frontend
-* ASP.NET Core Web API Backend
-* REST API Communication
-* Dependency Injection
-* Service Layer Architecture
-* DTO-Based Request/Response Models
+Supports debugging scenarios for:
 
-### Interactive User Interface
+* C#
+* JavaScript
+* TypeScript
+* Python
+* SQL
+* Java
+* React
+* ASP.NET Core
+* REST APIs
 
-* Modern dashboard-style layout
-* Real-time API integration
-* Responsive design
-* Developer-friendly workflow
+### Local AI Processing
+
+Powered by:
+
+* Ollama
+* Qwen2.5-Coder
+
+No external AI API subscriptions required.
 
 ---
 
@@ -76,10 +85,13 @@ ASP.NET Core Web API
 Service Layer
        │
        ▼
-AI Analysis Engine
+Ollama Local LLM
        │
        ▼
-Analysis Results
+AI Bug Analysis
+       │
+       ▼
+Structured Response
 ```
 
 ---
@@ -99,7 +111,12 @@ Analysis Results
 * ASP.NET Core Web API
 * C#
 * Dependency Injection
-* RESTful APIs
+* REST APIs
+
+### AI
+
+* Ollama
+* Qwen2.5-Coder
 
 ### Development Tools
 
@@ -108,13 +125,6 @@ Analysis Results
 * Postman
 * Git
 * GitHub
-
-### Planned Integrations
-
-* OpenAI API
-* SQLite / SQL Server
-* Authentication & Authorization
-* Cloud Deployment
 
 ---
 
@@ -131,112 +141,201 @@ AI-Bug-Explanation-Tool
 │   ├── Services
 │   └── Data
 │
-└── bug-explainer-client
-    ├── src
-    ├── public
-    └── assets
+├── bug-explainer-client
+│   ├── src
+│   ├── public
+│   └── assets
+│
+└── README.md
 ```
 
 ---
 
-## 🔄 Application Workflow
+## 🔄 Workflow
 
-1. User submits an error message, stack trace, and code snippet.
-2. Frontend sends a request to the ASP.NET Core API.
-3. Backend processes the debugging request.
-4. Analysis service generates debugging insights.
-5. Results are returned through REST APIs.
-6. Frontend displays a structured bug report.
-7. Developers use the recommendations to resolve issues faster.
+### Step 1
 
----
+Developer enters:
 
-## 🎯 Future Enhancements
+* Programming Language
+* Framework
+* Error Message
+* Stack Trace
+* Code Snippet
 
-### AI Integration
+### Step 2
 
-* OpenAI-powered bug analysis
-* Context-aware debugging assistance
-* Multi-language code understanding
+React frontend sends the request to the ASP.NET Core Web API.
 
-### Analysis History
+### Step 3
 
-* Store previous bug reports
-* Search historical analyses
-* Track recurring issues
+The backend service forwards the debugging context to Ollama.
 
-### Dashboard Analytics
+### Step 4
 
-* Total analyses
-* Severity distribution
-* Most common bug categories
-* Language-specific trends
+The local AI model analyzes the issue.
 
-### Authentication
+### Step 5
 
-* User registration
-* Login functionality
-* Personal analysis history
+Structured debugging insights are returned.
 
-### Export Features
+### Step 6
 
-* PDF bug reports
-* Shareable analysis links
-
-### Deployment
-
-* Frontend deployment
-* Backend cloud hosting
-* CI/CD pipelines
+Results are displayed in a user-friendly format.
 
 ---
 
-## 📸 Screenshots
+## 📸 Example Analysis
 
-Screenshots will be added as the application evolves.
+### Input
+
+```javascript
+const user = undefined;
+console.log(user.name);
+```
+
+Error:
+
+```text
+Cannot read properties of undefined (reading 'name')
+```
+
+### AI Output
+
+**Severity:** High
+
+**Root Cause:**
+The variable `user` is undefined and is being accessed without validation.
+
+**Suggested Fix:**
+
+```javascript
+if (user) {
+  console.log(user.name);
+}
+```
+
+**Prevention Tip:**
+Use null checks or optional chaining before accessing object properties.
 
 ---
 
-## 🤝 Learning Objectives
+## 🎯 Learning Objectives
 
 This project demonstrates practical experience in:
 
 * Full-Stack Development
-* React Application Development
+* React Development
 * ASP.NET Core Web API Development
-* REST API Design
-* Service-Oriented Architecture
+* REST API Integration
 * Dependency Injection
+* Service-Oriented Architecture
+* AI Integration
+* Prompt Engineering
+* Local LLM Deployment
 * Software Troubleshooting Workflows
-* AI-Powered Developer Tools
-* Modern Software Engineering Practices
 
 ---
 
-## 📈 Project Status
+## 📈 Current Status
 
-🚧 Active Development
+### Version 1.0
 
-Current Phase:
+Completed:
 
-* Frontend UI Completed
-* Backend API Completed
-* React ↔ API Integration Completed
+* React Frontend
+* ASP.NET Core Backend
+* DTO Architecture
+* Service Layer
+* Dependency Injection
+* Swagger Documentation
+* Ollama Integration
+* AI Bug Analysis
+* Responsive User Interface
 
-Upcoming Phase:
+---
 
-* OpenAI Integration
-* Database Persistence
-* Analysis History
-* Dashboard Analytics
-* Deployment
+## 🚀 Planned Enhancements
+
+### Analysis History
+
+Store previous bug analyses.
+
+### SQLite Database
+
+Persist analysis results and metadata.
+
+### Dashboard Analytics
+
+Visualize:
+
+* Total Analyses
+* Severity Distribution
+* Common Bug Categories
+* Technology Trends
+
+### Log File Upload
+
+Analyze:
+
+* Application Logs
+* Error Logs
+* System Logs
+
+### AI Follow-Up Chat
+
+Allow developers to ask:
+
+* Why did this happen?
+* Show another solution.
+* Explain in simple terms.
+* What is the best practice?
+
+### PDF Export
+
+Generate shareable debugging reports.
+
+### Authentication
+
+* User Accounts
+* Personal Analysis History
+* Saved Reports
+
+---
+
+## 💼 Portfolio Value
+
+This project showcases:
+
+* Full-Stack Engineering
+* AI-Assisted Development
+* Software Troubleshooting
+* API Design
+* Enterprise Application Architecture
+* Modern Development Workflows
+
+It demonstrates how AI can be integrated into software engineering workflows to improve developer productivity and accelerate issue resolution.
 
 ---
 
 ## 👨‍💻 Author
 
-**Rahesh Saravanan**
+### Rahesh Saravanan
 
 AI & Full Stack Engineer
 
-Building practical software solutions across AI, full-stack development, automation, and enterprise application workflows.
+GitHub: https://github.com/raheshcse
+
+LinkedIn: https://www.linkedin.com/in/raheshsaravanan/
+
+Building intelligent software solutions across AI, full-stack development, automation, cybersecurity, and enterprise application workflows.
+
+---
+
+## ⭐ Version
+
+**Current Release:** v1.0.0
+
+**Status:** Active Development
+
+**Next Milestone:** Analysis History + SQLite Database + Dashboard Analytics
