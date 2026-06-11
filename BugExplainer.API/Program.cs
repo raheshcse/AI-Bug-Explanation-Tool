@@ -8,6 +8,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<IBugAnalysisService, BugAnalysisService>();
+builder.Services.AddHttpClient<IAiBugAnalyzerService, OllamaBugAnalyzerService>();
 
 builder.Services.AddCors(options =>
 {

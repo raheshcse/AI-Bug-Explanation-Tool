@@ -1,10 +1,77 @@
 import { useState } from "react";
 import "./App.css";
 
+const severityClasses = {
+  low: "severity-low",
+  medium: "severity-medium",
+  high: "severity-high",
+  critical: "severity-critical",
+};
+
+function getSeverityClass(severity = "") {
+  return severityClasses[severity.toLowerCase()] ?? "severity-medium";
+}
+
+function formatValue(value) {
+  if (value === null || value === undefined || value === "") {
+    return "Not provided.";
+  }
+
+  if (Array.isArray(value)) {
+    return value.join("\n");
+  }
+
+  if (typeof value === "object") {
+    return JSON.stringify(value, null, 2);
+  }
+
+  return String(value);
+}
+
+function TextBlock({ children }) {
+  return <p className="result-text">{formatValue(children)}</p>;
+}
+
+async function readApiError(response) {
+  const contentType = response.headers.get("content-type") ?? "";
+  const fallbackMessage = `Request failed with HTTP ${response.status}`;
+
+  try {
+    if (contentType.includes("application/json")) {
+      const body = await response.json();
+
+      return {
+        status: response.status,
+        statusText: response.statusText,
+        message: body?.title || body?.message || body?.error || fallbackMessage,
+        details: body,
+      };
+    }
+
+    const text = await response.text();
+
+    return {
+      status: response.status,
+      statusText: response.statusText,
+      message: text || fallbackMessage,
+      details: text,
+    };
+  } catch (err) {
+    console.error("Failed to read API error response", err);
+
+    return {
+      status: response.status,
+      statusText: response.statusText,
+      message: fallbackMessage,
+      details: null,
+    };
+  }
+}
+
 function App() {
   const [analysis, setAnalysis] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -32,14 +99,33 @@ function App() {
       });
 
       if (!response.ok) {
-        throw new Error("API request failed");
+        const apiError = await readApiError(response);
+        console.error("Bug analysis request failed", {
+          requestBody,
+          response: apiError,
+        });
+        setError(apiError);
+        return;
       }
 
       const data = await response.json();
       setAnalysis(data);
     } catch (err) {
-      setError("Something went wrong. Check if the backend is running or if CORS is blocked.");
-      console.error(err);
+      const networkError = {
+        status: null,
+        statusText: "Network error",
+        message:
+          err instanceof Error
+            ? err.message
+            : "Unable to reach the backend API. Check that it is running and reachable.",
+        details: err instanceof Error ? err.stack : err,
+      };
+
+      console.error("Bug analysis request could not be completed", {
+        requestBody,
+        error: err,
+      });
+      setError(networkError);
     } finally {
       setLoading(false);
     }
@@ -49,71 +135,155 @@ function App() {
     <div className="app">
       <div className="container">
         <div className="header">
-          <h1>AI Bug Explanation Tool</h1>
+          <div>
+            <p className="eyebrow">AI Debugging Workspace</p>
+            <h1>AI Bug Explanation Tool</h1>
+          </div>
           <p>Paste an error, stack trace, or code snippet and get a clear fix explanation.</p>
         </div>
 
         <div className="main-grid">
-          <div className="card">
+          <section className="panel input-panel" aria-labelledby="input-title">
+            <div className="panel-header">
+              <div>
+                <p className="section-label">Bug Details</p>
+                <h2 id="input-title">Describe the issue</h2>
+              </div>
+            </div>
+
             <form className="bug-form" onSubmit={handleSubmit}>
-              <input name="language" type="text" placeholder="Programming Language e.g. JavaScript" />
+              <div className="form-row">
+                <label>
+                  <span>Language</span>
+                  <input name="language" type="text" placeholder="C#, JavaScript, Python" />
+                </label>
 
-              <input name="framework" type="text" placeholder="Framework / Tool e.g. React, .NET, SQL" />
+                <label>
+                  <span>Framework / Tool</span>
+                  <input name="framework" type="text" placeholder="ASP.NET Core, React, SQL" />
+                </label>
+              </div>
 
-              <textarea name="errorMessage" placeholder="Paste error message here"></textarea>
+              <label>
+                <span>Error Message</span>
+                <textarea
+                  name="errorMessage"
+                  className="textarea-medium"
+                  placeholder="Paste the exact error message here"
+                ></textarea>
+              </label>
 
-              <textarea name="stackTrace" placeholder="Paste stack trace here optional"></textarea>
+              <label>
+                <span>Stack Trace</span>
+                <textarea
+                  name="stackTrace"
+                  className="textarea-large"
+                  placeholder="Paste stack trace here, if available"
+                ></textarea>
+              </label>
 
-              <textarea name="codeSnippet" placeholder="Paste code snippet here"></textarea>
+              <label>
+                <span>Code Snippet</span>
+                <textarea
+                  name="codeSnippet"
+                  className="textarea-large code-input"
+                  placeholder="Paste the relevant code snippet"
+                ></textarea>
+              </label>
 
-              <button type="submit" disabled={loading}>
+              <button className="submit-button" type="submit" disabled={loading}>
+                {loading && <span className="button-spinner" aria-hidden="true"></span>}
                 {loading ? "Analysing..." : "Explain Bug"}
               </button>
             </form>
-          </div>
+          </section>
 
-          <div className="card result-card">
-            <h2>Bug Analysis Result</h2>
+          <section className="panel result-panel" aria-labelledby="result-title">
+            <div className="panel-header result-heading">
+              <div>
+                <p className="section-label">Analysis</p>
+                <h2 id="result-title">Bug Analysis Result</h2>
+              </div>
 
-            {error && <p className="error-message">{error}</p>}
+              {analysis?.severity && (
+                <span className={`severity-badge ${getSeverityClass(analysis.severity)}`}>
+                  {analysis.severity}
+                </span>
+              )}
+            </div>
 
-            {!analysis && !error && (
+            {loading && (
+              <div className="loading-state" role="status">
+                <div className="spinner"></div>
+                <div>
+                  <strong>Analysing bug details</strong>
+                  <p>Ollama is reviewing the error, stack trace, and code.</p>
+                </div>
+              </div>
+            )}
+
+            {error && (
+              <div className="error-card" role="alert">
+                <div className="error-card-header">
+                  <span className="error-icon">!</span>
+                  <div>
+                    <strong>Analysis request failed</strong>
+                    <p>
+                      {error.status
+                        ? `HTTP ${error.status}${error.statusText ? ` ${error.statusText}` : ""}`
+                        : error.statusText}
+                    </p>
+                  </div>
+                </div>
+
+                <p className="error-summary">{error.message}</p>
+
+                {import.meta.env.DEV && error.details && (
+                  <details className="error-details">
+                    <summary>Backend error details</summary>
+                    <pre>{formatValue(error.details)}</pre>
+                  </details>
+                )}
+              </div>
+            )}
+
+            {!analysis && !error && !loading && (
               <p className="empty-state">
                 Your AI bug explanation will appear here after you submit the form.
               </p>
             )}
 
-            {analysis && (
-              <>
-                <div className="badge">Severity: {analysis.severity}</div>
-
+            {analysis && !loading && (
+              <div className="result-content">
                 <div className="result-section">
                   <h3>Summary</h3>
-                  <p>{analysis.summary}</p>
+                  <TextBlock>{analysis.summary}</TextBlock>
                 </div>
 
                 <div className="result-section">
                   <h3>Root Cause</h3>
-                  <p>{analysis.rootCause}</p>
+                  <TextBlock>{analysis.rootCause}</TextBlock>
                 </div>
 
                 <div className="result-section">
                   <h3>Suggested Fix</h3>
-                  <p>{analysis.fixSteps}</p>
+                  <TextBlock>{analysis.fixSteps}</TextBlock>
                 </div>
 
                 <div className="result-section">
                   <h3>Corrected Code</h3>
-                  <pre>{analysis.correctedCode}</pre>
+                  <pre className="code-block">
+                    <code>{formatValue(analysis.correctedCode)}</code>
+                  </pre>
                 </div>
 
                 <div className="result-section">
                   <h3>Prevention Tips</h3>
-                  <p>{analysis.preventionTips}</p>
+                  <TextBlock>{analysis.preventionTips}</TextBlock>
                 </div>
-              </>
+              </div>
             )}
-          </div>
+          </section>
         </div>
       </div>
     </div>

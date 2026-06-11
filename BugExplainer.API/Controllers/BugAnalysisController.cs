@@ -16,9 +16,9 @@ public class BugAnalysisController : ControllerBase
     }
 
     [HttpPost("explain")]
-    public IActionResult ExplainBug([FromBody] BugAnalysisRequestDto request)
+    public async Task<IActionResult> ExplainBug([FromBody] BugAnalysisRequestDto request)
     {
-        var result = _bugAnalysisService.ExplainBug(request);
+        var result = await _bugAnalysisService.ExplainBugAsync(request);
         return Ok(result);
     }
 }

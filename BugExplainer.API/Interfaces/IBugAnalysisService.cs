@@ -4,5 +4,5 @@ namespace BugExplainer.API.Interfaces;
 
 public interface IBugAnalysisService
 {
-    BugAnalysisResponseDto ExplainBug(BugAnalysisRequestDto request);
+    Task<BugAnalysisResponseDto> ExplainBugAsync(BugAnalysisRequestDto request);
 }
