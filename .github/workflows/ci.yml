@@ -5,28 +5,25 @@ on:
     branches:
       - main
 
+  pull_request:
+    branches:
+      - main
+
 jobs:
-  system-info:
+  build-backend:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Code
+      - name: Checkout source code
         uses: actions/checkout@v4
 
-      - name: Display Current Directory
-        run: pwd
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
 
-      - name: List Repository Files
-        run: ls -la
+      - name: Restore backend dependencies
+        run: dotnet restore BugExplainer.API/BugExplainer.API.csproj
 
-      - name: Display .NET Version
-        run: dotnet --version
-
-      - name: Display Node Version
-        run: node --version
-
-      - name: Display NPM Version
-        run: npm --version
-
-      - name: Print Success Message
-        run: echo "Runner is working successfully!"
+      - name: Build backend
+        run: dotnet build BugExplainer.API/BugExplainer.API.csproj --configuration Release --no-restore
