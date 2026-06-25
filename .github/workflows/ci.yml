@@ -27,3 +27,21 @@ jobs:
 
       - name: Build backend
         run: dotnet build BugExplainer.API/BugExplainer.API.csproj --configuration Release --no-restore
+  build-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Install frontend dependencies
+        working-directory: bug-explainer-client
+        run: npm install
+
+      - name: Build frontend
+        working-directory: bug-explainer-client
+        run: npm run build
