@@ -27,6 +27,18 @@ jobs:
 
       - name: Build backend
         run: dotnet build BugExplainer.API/BugExplainer.API.csproj --configuration Release --no-restore
+
+      - name: Run backend tests
+        run: dotnet test BugExplainer.Tests/BugExplainer.Tests.csproj --configuration Release --no-build
+
+      - name: Publish backend
+        run: dotnet publish BugExplainer.API/BugExplainer.API.csproj --configuration Release --output ./publish/backend
+
+      - name: Upload backend artifact
+        uses: actions/upload-artifact@v4
+        with:
+         name: backend-artifact
+         path: ./publish/backend 
   build-frontend:
     runs-on: ubuntu-latest
     steps:
@@ -45,3 +57,9 @@ jobs:
       - name: Build frontend
         working-directory: bug-explainer-client
         run: npm run build
+
+      - name: Upload frontend artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-artifact
+          path: bug-explainer-client/dist
